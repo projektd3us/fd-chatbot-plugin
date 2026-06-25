@@ -134,43 +134,44 @@ JavaScript execution (DOMContentLoaded)                                | |
 ## 4. File Structure
 
 ```
-wp-chatbot-widget/
+fd-chatbot-plugin/                        (repository root)
 |
-+-- wp-chatbot-widget.php          Main plugin file. Defines constants, requires includes,
-|                                  registers all four WordPress action hooks.
++-- README.md                             GitHub landing page with screenshots and usage guide.
++-- DOCUMENTATION.md                      This file.
++-- screenshots/                          Demo screenshots referenced in README.md.
 |
-+-- readme.txt                     WordPress.org-format readme (description, install, FAQ,
-|                                  API contract summary, changelog).
-|
-+-- DOCUMENTATION.md               This file.
-|
-+-- includes/
-|   +-- class-settings.php         WP_Chatbot_Widget_Settings class.
-|                                   get_defaults()        canonical default values
-|                                   get_settings()        merge saved + defaults
-|                                   register()            Settings API registration
-|                                   sanitize($input)      validation / escaping
-|                                   get_frontend_config() PHP-to-JS config array
-|                                   get_css_variables()   CSS var string for data attribute
-|
-+-- admin/
-|   +-- settings-page.php          HTML form rendered inside the WP admin. Uses
-|                                  settings_fields(), submit_button(), and WP escaping
-|                                  helpers (esc_attr, esc_html, esc_textarea).
-|
-+-- assets/
-    +-- css/
-    |   +-- chatbot-widget.css     All styles. Uses CSS custom properties prefixed
-    |                              --wp-cb-* so they cannot clash with theme styles.
++-- wp-chatbot-widget/                    The installable plugin directory.
     |
-    +-- js/
-        +-- chatbot-core.js        Self-contained IIFE. Exports window.WPChatbotCore.
-        |                          All chat logic: API calls, session, messages, voice,
-        |                          feedback, jobs, i18n, theme.
+    +-- wp-chatbot-widget.php             Main plugin file. Defines constants, requires includes,
+    |                                     registers all four WordPress action hooks.
+    |
+    +-- includes/
+    |   +-- class-settings.php            WP_Chatbot_Widget_Settings class.
+    |                                      get_defaults()        canonical default values
+    |                                      get_settings()        merge saved + defaults
+    |                                      register()            Settings API registration
+    |                                      sanitize($input)      validation / escaping
+    |                                      get_frontend_config() PHP-to-JS config array
+    |                                      get_css_variables()   CSS var string for data attribute
+    |
+    +-- admin/
+    |   +-- settings-page.php             HTML form rendered inside the WP admin. Uses
+    |                                     settings_fields(), submit_button(), and WP escaping
+    |                                     helpers (esc_attr, esc_html, esc_textarea).
+    |
+    +-- assets/
+        +-- css/
+        |   +-- chatbot-widget.css        All styles. CSS custom properties prefixed
+        |                                 --wp-cb-* so they cannot clash with theme styles.
         |
-        +-- chatbot-widget.js      Self-contained IIFE. Depends on chatbot-core.js.
-                                   Builds the widget HTML, handles minimize/bubble,
-                                   applies CSS variables, then delegates to WPChatbotCore.
+        +-- js/
+            +-- chatbot-core.js           Self-contained IIFE. Exports window.WPChatbotCore.
+            |                             All chat logic: API calls, session, messages, voice,
+            |                             feedback, jobs, i18n, theme.
+            |
+            +-- chatbot-widget.js         Self-contained IIFE. Depends on chatbot-core.js.
+                                          Builds the widget HTML, handles minimize/bubble,
+                                          applies CSS variables, then delegates to WPChatbotCore.
 ```
 
 ---

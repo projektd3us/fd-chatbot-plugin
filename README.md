@@ -226,7 +226,7 @@ JavaScript (DOMContentLoaded)
 
 ### Steps
 
-1. Download `wp-chatbot-widget.zip` from this repository (or clone and zip the `wp-chatbot-widget/` folder).
+1. Clone this repository and zip the `wp-chatbot-widget/` folder, or download it as a zip from GitHub (**Code > Download ZIP**, then extract and re-zip just the `wp-chatbot-widget/` subfolder).
 2. In the WordPress admin go to **Plugins > Add New > Upload Plugin**.
 3. Upload the zip and click **Install Now**, then **Activate**.
 4. Go to **Settings > Chatbot Widget**.
