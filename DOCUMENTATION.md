@@ -1,9 +1,9 @@
-# WP Chatbot Widget — Plugin Documentation
+# WP Chatbot Widget: Plugin Documentation
 
 ## Table of Contents
 
 1. [Overview](#1-overview)
-2. [WordPress as a Framework — Extension Points Used](#2-wordpress-as-a-framework--extension-points-used)
+2. [WordPress as a Framework: Extension Points Used](#2-wordpress-as-a-framework-extension-points-used)
 3. [Architecture](#3-architecture)
 4. [File Structure](#4-file-structure)
 5. [Installation](#5-installation)
@@ -19,11 +19,11 @@
 
 ## 1. Overview
 
-**Live demo:** [fd.projekttech.ro](https://fd.projekttech.ro/) — the plugin is deployed and running here; visit to interact with the chatbot widget directly.
+**Live demo:** [fd.projekttech.ro](https://fd.projekttech.ro/). The plugin is deployed and running there; visit to interact with the widget.
 
-**WP Chatbot Widget** is a WordPress plugin that injects a fully-featured, floating AI chatbot window into any WordPress site's front end. The chatbot window is minimizable (collapses to a bubble), supports voice input and output, multilingual UI, feedback (like/dislike), an optional job-listing sidebar, and a health-check status indicator. Every URL, color, and label is configured through the WordPress admin settings page — no code changes are required to deploy it against a different backend.
+**WP Chatbot Widget** is a WordPress plugin that adds a floating chatbot window to any WordPress site's front end. The window is minimizable (collapses to a bubble), supports voice input and output, a multilingual UI, per-message feedback (like/dislike), an optional job-listing sidebar, and a health-check status indicator. Every URL, color, and label is configured through the WordPress admin settings page; no code changes are required to deploy it against a different backend.
 
-The plugin is intentionally **backend-agnostic**: it defines a simple HTTP contract (see §7) and delegates all AI logic to the operator's own service.
+The plugin is **backend-agnostic**: it defines a simple HTTP contract (see §7) and delegates all AI logic to the operator's own service.
 
 ### Key design principles
 
@@ -36,7 +36,7 @@ The plugin is intentionally **backend-agnostic**: it defines a simple HTTP contr
 
 ---
 
-## 2. WordPress as a Framework — Extension Points Used
+## 2. WordPress as a Framework: Extension Points Used
 
 WordPress provides a hook-based plugin architecture. A plugin registers callbacks against named **action** and **filter** hooks that WordPress fires at defined points in the request lifecycle. This plugin uses four action hooks:
 
@@ -51,7 +51,7 @@ add_action( 'wp_footer',         'wp_chatbot_widget_render_container', 5 );
 
 | Hook | When it fires | What this plugin does |
 |---|---|---|
-| `admin_menu` | Admin panel menu is built | Registers a settings page under *Settings → Chatbot Widget* |
+| `admin_menu` | Admin panel menu is built | Registers a settings page under *Settings > Chatbot Widget* |
 | `admin_init` | Admin request initialisation | Registers the settings group and sanitize callback via the **Settings API** |
 | `wp_enqueue_scripts` | Front-end `<head>` asset phase | Conditionally enqueues CSS and JS; passes PHP config to JS via `wp_localize_script` |
 | `wp_footer` | Just before `</body>` on front end | Renders the empty root `<div>` that JS will populate |
@@ -86,47 +86,47 @@ if ( ! current_user_can( 'manage_options' ) ) {
 
 ```
 WordPress request lifecycle
-│
-├── admin_init  ──────────────────────────────────────────────────────────────────────────┐
-│   WP_Chatbot_Widget_Settings::register()                                                 │
-│   Registers option, sanitize callback, settings group                                    │
-│                                                                                          │
-├── admin_menu ─────────────────────────────────────────────────────────────────────────┐  │
-│   add_options_page() → renders admin/settings-page.php                                │  │
-│   PHP form → WP Settings API → sanitize() → wp_options table                         │  │
-│                                                                                       │  │
-└── Front-end request                                                                   │  │
-    │                                                                                   │  │
-    ├── wp_enqueue_scripts                                                              │  │
-    │   ├── chatbot-widget.css          (styles)                                        │  │
-    │   ├── chatbot-core.js             (chat logic)                                    │  │
-    │   └── chatbot-widget.js           (UI shell)     ← depends on core               │  │
-    │       └── wp_localize_script → window.wpChatbotWidgetConfig  (PHP→JS bridge)     │  │
-    │                                                                                   │  │
-    └── wp_footer                                                                       │  │
-        └── <div id="wp-chatbot-widget-root" data-css-vars="...">                      │  │
-                                                                                        │  │
-JavaScript execution (DOMContentLoaded)                                                 │  │
-│                                                                                        │  │
-├── chatbot-widget.js :: init()                                                          │  │
-│   ├── Reads window.wpChatbotWidgetConfig                                               │  │
-│   ├── Parses data-css-vars → sets CSS custom properties on root element               │  │
-│   ├── Injects full widget HTML (bubble + chat window + modals + voice popup + jobs)   │  │
-│   ├── Sets up minimize ↔ bubble toggle (persisted in sessionStorage)                  │  │
-│   └── Calls WPChatbotCore.init(root, config)                                          │  │
-│                                                                                        │  │
-└── chatbot-core.js :: Core(root, config)                                               │  │
-    ├── bindElements()       – caches all DOM references                                │  │
-    ├── loadSession()        – restores sessionId from localStorage                     │  │
-    ├── setupEventListeners()– input, send, theme, settings, voice, language, jobs      │  │
-    ├── callAPI()            – fetch with fallback URL chain + timeout + retry          │  │
-    ├── sendMessage()        – orchestrates user message → API → bot reply              │  │
-    ├── handleJobFilters()   – optional job-sidebar population                          │  │
-    ├── handleLike/Dislike() – optional feedback POSTs                                  │  │
-    └── voice subsystem      – Web Speech API + ElevenLabs TTS (optional)              │  │
-                                                                                        │  │
-                   ←─────────────────── Settings API ──────────────────────────────────┘  │
-                   ←─────────────────── admin_menu ─────────────────────────────────────┘
+|
++-- admin_init  ---------------------------------------------------------+
+|   WP_Chatbot_Widget_Settings::register()                               |
+|   Registers option, sanitize callback, settings group                  |
+|                                                                        |
++-- admin_menu  -------------------------------------------------------+ |
+|   add_options_page() -> renders admin/settings-page.php              | |
+|   PHP form -> WP Settings API -> sanitize() -> wp_options table      | |
+|                                                                      | |
++-- Front-end request                                                  | |
+    |                                                                  | |
+    +-- wp_enqueue_scripts                                             | |
+    |   +-- chatbot-widget.css          (styles)                       | |
+    |   +-- chatbot-core.js             (chat logic)                   | |
+    |   +-- chatbot-widget.js           (UI shell, depends on core)    | |
+    |       +-- wp_localize_script -> window.wpChatbotWidgetConfig     | |
+    |                                                                  | |
+    +-- wp_footer                                                      | |
+        +-- <div id="wp-chatbot-widget-root" data-css-vars="...">      | |
+                                                                       | |
+JavaScript execution (DOMContentLoaded)                                | |
+|                                                                       | |
++-- chatbot-widget.js :: init()                                         | |
+|   +-- Reads window.wpChatbotWidgetConfig                              | |
+|   +-- Parses data-css-vars -> sets CSS custom properties on root      | |
+|   +-- Injects widget HTML (bubble + chat window + modals + voice)     | |
+|   +-- Sets up minimize / bubble toggle (persisted in sessionStorage)  | |
+|   +-- Calls WPChatbotCore.init(root, config)                          | |
+|                                                                       | |
++-- chatbot-core.js :: Core(root, config)                               | |
+    +-- bindElements()        caches all DOM references                | |
+    +-- loadSession()         restores sessionId from localStorage     | |
+    +-- setupEventListeners() input, send, theme, settings, voice      | |
+    +-- callAPI()             fetch with fallback URL chain + timeout   | |
+    +-- sendMessage()         user message -> API -> bot reply         | |
+    +-- handleJobFilters()    optional job-sidebar population          | |
+    +-- handleLike/Dislike()  optional feedback POSTs                  | |
+    +-- voice subsystem       Web Speech API + ElevenLabs TTS          | |
+                                                                       | |
+                   <-------------- Settings API ----------------------- + |
+                   <-------------- admin_menu --------------------------- +
 ```
 
 ---
@@ -135,40 +135,40 @@ JavaScript execution (DOMContentLoaded)                                         
 
 ```
 wp-chatbot-widget/
-│
-├── wp-chatbot-widget.php          Main plugin file. Defines constants, requires includes,
-│                                  registers all four WordPress action hooks.
-│
-├── readme.txt                     WordPress.org-format readme (description, install, FAQ,
-│                                  API contract summary, changelog).
-│
-├── DOCUMENTATION.md               This file.
-│
-├── includes/
-│   └── class-settings.php         WP_Chatbot_Widget_Settings class.
-│                                   get_defaults()       – canonical default values
-│                                   get_settings()       – merge saved + defaults
-│                                   register()           – Settings API registration
-│                                   sanitize($input)     – validation / escaping
-│                                   get_frontend_config()– PHP→JS config array
-│                                   get_css_variables()  – CSS var string for data attribute
-│
-├── admin/
-│   └── settings-page.php          HTML form rendered inside the WP admin. Uses
-│                                  settings_fields(), submit_button(), and WP escaping
-│                                  helpers (esc_attr, esc_html, esc_textarea).
-│
-└── assets/
-    ├── css/
-    │   └── chatbot-widget.css     All styles. Uses CSS custom properties prefixed
-    │                              --wp-cb-* so they cannot clash with theme styles.
-    │
-    └── js/
-        ├── chatbot-core.js        Self-contained IIFE. Exports window.WPChatbotCore.
-        │                          All chat logic: API calls, session, messages, voice,
-        │                          feedback, jobs, i18n, theme.
-        │
-        └── chatbot-widget.js      Self-contained IIFE. Depends on chatbot-core.js.
+|
++-- wp-chatbot-widget.php          Main plugin file. Defines constants, requires includes,
+|                                  registers all four WordPress action hooks.
+|
++-- readme.txt                     WordPress.org-format readme (description, install, FAQ,
+|                                  API contract summary, changelog).
+|
++-- DOCUMENTATION.md               This file.
+|
++-- includes/
+|   +-- class-settings.php         WP_Chatbot_Widget_Settings class.
+|                                   get_defaults()        canonical default values
+|                                   get_settings()        merge saved + defaults
+|                                   register()            Settings API registration
+|                                   sanitize($input)      validation / escaping
+|                                   get_frontend_config() PHP-to-JS config array
+|                                   get_css_variables()   CSS var string for data attribute
+|
++-- admin/
+|   +-- settings-page.php          HTML form rendered inside the WP admin. Uses
+|                                  settings_fields(), submit_button(), and WP escaping
+|                                  helpers (esc_attr, esc_html, esc_textarea).
+|
++-- assets/
+    +-- css/
+    |   +-- chatbot-widget.css     All styles. Uses CSS custom properties prefixed
+    |                              --wp-cb-* so they cannot clash with theme styles.
+    |
+    +-- js/
+        +-- chatbot-core.js        Self-contained IIFE. Exports window.WPChatbotCore.
+        |                          All chat logic: API calls, session, messages, voice,
+        |                          feedback, jobs, i18n, theme.
+        |
+        +-- chatbot-widget.js      Self-contained IIFE. Depends on chatbot-core.js.
                                    Builds the widget HTML, handles minimize/bubble,
                                    applies CSS variables, then delegates to WPChatbotCore.
 ```
@@ -187,17 +187,17 @@ wp-chatbot-widget/
 
 1. Copy the `wp-chatbot-widget/` folder into `/wp-content/plugins/`.
 2. In the WordPress admin, go to **Plugins** and activate *Chatbot Widget*.
-3. Go to **Settings → Chatbot Widget**.
+3. Go to **Settings > Chatbot Widget**.
 4. Enter at minimum the **Chat API URL** and **Chatbot name**, then save.
-5. Visit the front end — the floating chat window appears immediately.
+5. Visit the front end; the floating chat window appears.
 
-The widget is only enqueued when **Chat API URL** is non-empty. Leaving it blank is the safe way to disable the widget without deactivating the plugin.
+The widget is only enqueued when **Chat API URL** is non-empty. Leaving it blank disables the widget without deactivating the plugin.
 
 ---
 
 ## 6. Configuration Reference
 
-All settings are available under **Settings → Chatbot Widget** in the WordPress admin.
+All settings are available under **Settings > Chatbot Widget** in the WordPress admin.
 
 ### General
 
@@ -206,7 +206,7 @@ All settings are available under **Settings → Chatbot Widget** in the WordPres
 | Chatbot name | `chatbot_name` | `""` | Name displayed in the chat header |
 | Welcome message | `welcome_message` | `""` | First message shown when the widget opens |
 | Input placeholder | `input_placeholder` | `"Type your message..."` | Placeholder text for the message input |
-| Max message length | `max_message_length` | `500` | Characters allowed per message (100–2000) |
+| Max message length | `max_message_length` | `500` | Characters allowed per message (100-2000) |
 | Footer text | `footer_text` | `""` | Small text below the input bar; hidden if empty |
 
 ### API
@@ -218,11 +218,11 @@ All settings are available under **Settings → Chatbot Widget** in the WordPres
 | Proxy URL | `proxy_url` | Base URL for a proxy server; prefixed to `/chat`, `/api/elevenlabs/v1/*`, feedback paths |
 | Health check URL | `health_check_url` | GET endpoint; result shown as API status in widget settings |
 
-**URL resolution order** for chat: Proxy (`proxy_url + /chat`) → Chat API URL → Fallback Chat API URL. The first successful response wins.
+**URL resolution order** for chat: Proxy (`proxy_url + /chat`) > Chat API URL > Fallback Chat API URL. The first successful response is used.
 
 ### Appearance
 
-All color settings accept hex values (`#rrggbb`). They are applied as CSS custom properties on the widget root element, meaning they never affect the host theme.
+All color settings accept hex values (`#rrggbb`). They are applied as CSS custom properties on the widget root element and do not affect the host theme.
 
 Light-mode properties: `primary_color`, `primary_hover`, `bg_chat`, `bg_user_message`, `bg_bot_message`, `text_primary`, `text_secondary`, `border_color`, and others.
 
@@ -253,7 +253,7 @@ Dark-mode properties: suffixed `_dark` (e.g. `bg_primary_dark`, `text_primary_da
 
 ## 7. Backend API Contract
 
-The plugin is backend-agnostic. Any service implementing the following contract is compatible.
+The plugin works with any backend that implements the following contract.
 
 ### Chat endpoint
 
@@ -269,7 +269,7 @@ Content-Type: application/json
 }
 ```
 
-The `message` field is always prefixed with `"Answer in {language}: "` by the client (based on the user's selected UI language). The `redis_session_id` is omitted on the first message and included on subsequent messages so the backend can maintain conversation context.
+The `message` field is always prefixed with `"Answer in {language}: "` by the client, based on the user's selected UI language. The `redis_session_id` is omitted on the first message and included on subsequent messages so the backend can maintain conversation context.
 
 **Response**
 
@@ -345,9 +345,9 @@ The plugin also accepts `data` instead of `rows`. Per-job fields used: `occupati
 
 ## 8. Frontend Module Design
 
-Both JavaScript files are **immediately-invoked function expressions (IIFEs)** that expose nothing to the global scope except the minimum needed interface.
+Both JavaScript files are **immediately-invoked function expressions (IIFEs)** that expose nothing to the global scope except the minimum required interface.
 
-### `chatbot-core.js` — `window.WPChatbotCore`
+### `chatbot-core.js` / `window.WPChatbotCore`
 
 Exports a single object with one method:
 
@@ -359,11 +359,11 @@ window.WPChatbotCore = {
 
 Internally it creates a `Core` instance (constructor function, prototype-based) which owns:
 
-- **Session management** — `loadSession()` / `saveSession()` backed by `localStorage`
-- **API call chain** — `getChatUrls()` builds an ordered list; `callAPI()` tries each URL in turn with an `AbortController` timeout (180 s)
-- **Message rendering** — `addMessage()` creates DOM elements; `formatMessage()` converts a simple Markdown subset (`**bold**`, `[link](url)`, `* list`) to HTML
-- **Voice subsystem** — `startListeningInPopup()` uses the browser's `SpeechRecognition` API; `speakWithElevenLabsInPopup()` fetches audio from ElevenLabs and plays it via `<audio>`; `speakWithWebSpeechInPopup()` falls back to `SpeechSynthesisUtterance`
-- **i18n** — a `translations` map keyed by language code (en / ro / fr / de / hu); `getT()` returns the active translation object
+- **Session management:** `loadSession()` / `saveSession()` backed by `localStorage`
+- **API call chain:** `getChatUrls()` builds an ordered list; `callAPI()` tries each URL with an `AbortController` timeout (180 s)
+- **Message rendering:** `addMessage()` creates DOM elements; `formatMessage()` converts a Markdown subset (`**bold**`, `[link](url)`, `* list`) to HTML
+- **Voice subsystem:** `startListeningInPopup()` uses the browser's `SpeechRecognition` API; `speakWithElevenLabsInPopup()` fetches audio from ElevenLabs and plays it via `<audio>`; `speakWithWebSpeechInPopup()` falls back to `SpeechSynthesisUtterance`
+- **i18n:** a `translations` map keyed by language code (en / ro / fr / de / hu); `getT()` returns the active translation object
 
 ### `chatbot-widget.js`
 
@@ -376,7 +376,9 @@ Responsibilities:
 4. Manages the minimize/restore toggle between the chat window and the floating bubble, persisted in `sessionStorage`
 5. Calls `WPChatbotCore.init(root, config)` to hand off chat logic
 
-### PHP → JavaScript data bridge
+If `wpChatbotWidgetConfig` is absent or has no `chatApiUrl`, the script exits without doing anything.
+
+### PHP to JavaScript data bridge
 
 `wp_localize_script` outputs a `<script>` block that assigns the config to a named global before the plugin scripts run:
 
@@ -391,21 +393,19 @@ var wpChatbotWidgetConfig = {
 </script>
 ```
 
-`chatbot-widget.js` reads `window.wpChatbotWidgetConfig` and aborts silently if it is absent or has no `chatApiUrl`, making the plugin safe against partial configurations.
-
 ---
 
 ## 9. Theming and CSS Variable System
 
 All CSS custom properties are prefixed `--wp-cb-` to avoid collisions with the host WordPress theme.
 
-The PHP method `WP_Chatbot_Widget_Settings::get_css_variables()` serialises the color settings into a semicolon-delimited string of `name:value` pairs and stores it in the `data-css-vars` attribute of the root `<div>`. JavaScript then applies each pair as an inline style on that element:
+`WP_Chatbot_Widget_Settings::get_css_variables()` serialises the color settings into a semicolon-delimited string of `name:value` pairs and stores it in the `data-css-vars` attribute of the root `<div>`. JavaScript then applies each pair as an inline style on that element:
 
 ```js
 style.setProperty('--wp-cb-primary-color', '#f97316');
 ```
 
-Because all CSS rules in `chatbot-widget.css` use `var(--wp-cb-*)` tokens, and because those properties are set on the root element, theming is fully scoped to the widget and overrides come from a single source of truth (the admin settings page).
+All CSS rules in `chatbot-widget.css` use `var(--wp-cb-*)` tokens, and those properties are set on the root element, so theming is scoped to the widget. The admin settings page is the single place to update colors.
 
 Dark mode is toggled by setting `data-theme="dark"` on the root element, which CSS targets via `[data-theme="dark"]` selectors.
 
@@ -426,11 +426,11 @@ Dark mode is toggled by setting `data-theme="dark"` on the root element, which C
 ### Front end
 
 - `escapeHtml()` (defined in both JS files) uses a throwaway `<div>.textContent` assignment to safely HTML-encode any user-supplied or API-returned strings before insertion into the DOM, preventing XSS from malicious API responses.
-- No inline event handlers are set via `.innerHTML`; feedback and session buttons use `.addEventListener`.
+- Feedback and session buttons use `.addEventListener`; no inline event handlers are set via `.innerHTML`.
 
 ### ElevenLabs API key exposure
 
-When `elevenlabs_api_key` is set in the WordPress admin, it is passed to the browser via `wp_localize_script` and is therefore visible in page source. **For production use, configure a Proxy URL** so the browser communicates only with your own proxy, which holds the real API key server-side. The plugin's `proxyUrl` setting supports this pattern:
+When `elevenlabs_api_key` is set in the WordPress admin, it is passed to the browser via `wp_localize_script` and is visible in page source. To avoid this, configure a **Proxy URL** so the browser communicates only with your own proxy, which holds the real API key server-side. The plugin's `proxyUrl` setting supports this pattern:
 
 ```
 ElevenLabs voices:    GET  {proxyUrl}/api/elevenlabs/v1/voices
@@ -444,15 +444,15 @@ ElevenLabs TTS:       POST {proxyUrl}/api/elevenlabs/v1/text-to-speech/{voiceId}
 ### Add a new UI language
 
 1. Open `assets/js/chatbot-core.js`.
-2. Add a new entry to the `translations` object at the top of the IIFE, following the existing pattern (all keys must be present):
+2. Add a new entry to the `translations` object at the top of the IIFE (all keys must be present):
 
 ```js
 var translations = {
   // ... existing languages ...
   es: {
-    noSession: 'Sin sesión activa',
+    noSession: 'Sin sesion activa',
     charCount: function(c, max) { return c + '/' + max; },
-    error: 'Se produjo un error. Por favor, inténtelo de nuevo.',
+    error: 'Se produjo un error. Por favor, intentelo de nuevo.',
     // ... all other keys ...
   }
 };
@@ -480,11 +480,11 @@ var langNames = { en: 'english', ro: 'romanian', ..., es: 'spanish' };
 
 ### Change the backend
 
-No code changes are needed. Update **Chat API URL** in the admin settings to point to any service that implements the contract in §7. The fallback and proxy fields provide resilience and indirection without touching plugin code.
+Update **Chat API URL** in the admin settings to point to any service that implements the contract in §7. The fallback and proxy fields provide resilience without touching plugin code.
 
 ### Override styles
 
-Because all styles use `--wp-cb-*` custom properties, the simplest customization is through the admin color pickers. For structural changes, add a `<style>` block in your theme targeting `.wp-chatbot-widget-inner` or its children. The plugin's CSS specificity is kept deliberately low (single class selectors) to make theme overrides easy.
+All styles use `--wp-cb-*` custom properties, so the simplest customisation is through the admin color pickers. For structural changes, add a `<style>` block in your theme targeting `.wp-chatbot-widget-inner` or its children. The plugin uses single class selectors throughout, so theme overrides take precedence without needing `!important`.
 
 ---
 
@@ -494,4 +494,4 @@ Because all styles use `--wp-cb-*` custom properties, the simplest customization
 - **No nonce/CSRF on feedback endpoints.** Feedback POSTs are unauthenticated fire-and-forget calls; the backend should treat them as untrusted signals.
 - **Speech Recognition browser support.** `window.SpeechRecognition` / `window.webkitSpeechRecognition` is available in Chromium-based browsers and Safari 14.1+. Firefox does not support it. The voice button is always shown; unsupported browsers receive a graceful error message.
 - **Session stored in localStorage.** The session ID is not encrypted. It is a convenience token for backend session continuity, not an authentication credential.
-- **Single widget instance per page.** The plugin renders one `#wp-chatbot-widget-root` element in `wp_footer`. Embedding multiple independent widgets on the same page is not supported.
+- **Single widget instance per page.** The plugin renders one `#wp-chatbot-widget-root` element in `wp_footer`. Running multiple independent widgets on the same page is not supported.
